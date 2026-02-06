@@ -1,0 +1,346 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PGM1.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+            SELECT INFILE ASSIGN DD1
+            ORGANIZATION SEQUENTIAL
+            ACCESS MODE SEQUENTIAL
+            FILE STATUS WS-FS1.
+            SELECT ERRFILE ASSIGN DD2
+            ORGANIZATION SEQUENTIAL
+            ACCESS MODE SEQUENTIAL
+            FILE STATUS WS-FS2.
+            SELECT OUTFILE ASSIGN DD3
+            ORGANIZATION INDEXED
+            ACCESS MODE SEQUENTIAL
+            RECORD KEY IS K-HID
+            FILE STATUS WS-FS3.
+       DATA DIVISION.
+       FILE SECTION.
+       FD INFILE.
+       01 INREC.
+          05 IN-HID PIC X(5).
+          05 F   PIC X.
+          05 IN-NAME  PIC X(10).
+          05 F   PIC X.
+          05 IN-STREET PIC X(20).
+          05 F   PIC X.
+          05 IN-CITY   PIC X(20).
+          05 F   PIC X.
+          05 IN-STATE  PIC X(20).
+          05 F   PIC X.
+          05 IN-PIN    PIC 9(6).
+          05 F   PIC X.
+          05 IN-PHONE  PIC 9(10).
+          05 F   PIC X.
+          05 IN-PLY-NO PIC 9(10).
+          05 F   PIC X.
+          05 IN-PLY-AMT PIC 9(10).
+          05 F   PIC X.
+          05 IN-DOB     PIC X(10).
+          05 F   PIC X.
+          05 IN-PLY-ID  PIC X(5).
+          05 F   PIC X.
+          05 IN-PLY-CODE PIC X(10).
+          05 F   PIC X.
+          05 IN-AGT-CODE PIC X(5).
+          05 F   PIC X(7).
+       FD ERRFILE.
+       01 ERRREC.
+          05 E-HID PIC X(5).
+          05 F   PIC X.
+          05 E-NAME  PIC X(10).
+          05 F   PIC X.
+          05 E-STREET PIC X(20).
+          05 F   PIC X.
+          05 E-CITY   PIC X(20).
+          05 F   PIC X.
+          05 E-STATE  PIC X(20).
+          05 F   PIC X.
+          05 E-PIN    PIC 9(6).
+          05 F   PIC X.
+          05 E-PHONE  PIC 9(10).
+          05 F   PIC X.
+          05 E-PLY-NO PIC 9(10).
+          05 F   PIC X.
+          05 E-PLY-AMT PIC 9(10).
+          05 F   PIC X.
+          05 E-DOB     PIC X(10).
+          05 F   PIC X.
+          05 E-PLY-ID  PIC X(5).
+          05 F   PIC X.
+          05 E-PLY-CODE PIC X(10).
+          05 F   PIC X.
+          05 E-AGT-CODE PIC X(5).
+          05 F   PIC X.
+          05 ERR-MSG PIC X(20).
+          05 F PIC X(6).
+       FD OUTFILE.
+       01 OUTREC.
+          05 K-HID  PIC X(5).
+          05 F     PIC X.
+          05 K-PID   PIC X(5).
+          05 F     PIC X.
+          05 K-DOB PIC X(10).
+          05 F     PIC X.
+          05 K-AGT-CODE   PIC X(5).
+          05 F     PIC X(52).
+       FD OUTFILE2.
+       01 OUTREC2.
+          05 O-HOLDER-ID.
+          05 F     PIC X.
+          05 O-HOLDER-NAME.
+          05 F     PIC X.
+          05 O-STREET.
+          05 F     PIC X.
+          05 O-CITY.
+          05 F     PIC X.
+          05 O-STATE.
+          05 F     PIC X.
+          05 O-PIN-CODE.
+          05 F     PIC X.
+          05 O-PHONE-NUMBER.
+          05 F     PIC X.
+          05 O-POLICY-NUMBER.
+          05 F     PIC X.
+          05 O-POLICY-AMOUNT.
+          05 F     PIC X.
+          05 O-DATE-OF-BIRTH.
+          05 F     PIC X.
+          05 O-POLICY-ID.
+          05 F     PIC X.
+          05 O-POLICY-CODE.
+          05 F     PIC X.
+          05 O-AGENT-CODE.
+          05 F     PIC X(7).
+       WORKING-STORAGE SECTION.
+            EXEC SQL
+                INCLUDE HOLDCL
+            END-EXEC.
+            EXEC SQL
+                INCLUDE SQLCA
+            END-EXEC.
+            EXEC SQL
+               DECLARE CUR1 CURSOR  FOR
+                 SELECT HOLDER_ID,HOLDER_NAME,STREET,CITY,STATE,
+                      PIN_CODE,PHONE_NUMBER,POLICY_NUMBER,POLICY_AMOUNT,
+                      DATE_OF_BIRTH,POLICY_ID,POLICY_CODE,AGENT_CODE
+                      FROM HOLDERTBL
+            END-EXEC.
+       01 WS-FS1   PIC 9(2).
+       01 WS-FS2   PIC 9(2).
+       01 WS-FS3   PIC 9(2).
+       01 WS-SQLCODE   PIC S9(3) SIGN LEADING SEPARATE.
+       PROCEDURE DIVISION .
+       0000-MAIN-PARA.
+            PERFORM 1000-OPEN-PARA THRU
+                    1000-OPEN-PARA-EXIT.
+            PERFORM 1100-READ-PARA THRU
+                    1100-READ-PARA-EXIT UNTIL WS-FS1 = 10.
+            PERFORM 2000-FETCH-PARA THRU
+                    2000-FETCH-PARA UNTIL SQLCODE = 100.
+            PERFORM 3000-CLOSE-PARA THRU
+                    3000-CLOSE-PARA-EXIT.
+            PERFORM 9000-TERM-PARA THRU
+                    9000-TERM-PARA-EXIT.
+       1000-OPEN-PARA.
+            OPEN INPUT INFILE.
+           EVALUATE TRUE
+                WHEN WS-FS1 = 0
+                      DISPLAY 'OPEN INFILE SUCCESS'
+                WHEN OTHER
+                      DISPLAY 'OPEN INFILE ERROR' WS-FS1
+           END-EVALUATE.
+            OPEN OUTPUT ERRFILE
+           EVALUATE TRUE
+                WHEN WS-FS2  = 0
+                      DISPLAY 'OPEN ERRFILE SUCCESS'
+                WHEN OTHER
+                      DISPLAY 'OPEN ERRFILE ERROR' WS-FS2
+           END-EVALUATE.
+            OPEN OUTPUT OUTFILE
+           EVALUATE TRUE
+                WHEN WS-FS3  = 0
+                      DISPLAY 'OPEN OUTFILE SUCCESS'
+                WHEN OTHER
+                      DISPLAY 'OPEN OUTFILE ERROR' WS-FS3
+           END-EVALUATE.
+            EXEC SQL
+                OPEN CUR1
+            END-EXEC.
+            MOVE SQLCODE TO WS-SQLCODE.
+            EVALUATE TRUE
+                 WHEN SQLCODE = 0
+                       DISPLAY 'OPEN  CUR SUCCESS'
+                 WHEN OTHER
+                       DISPLAY 'OPEN CUR ERROR' WS-SQLCODE
+            END-EVALUATE.
+       1000-OPEN-PARA-EXIT.
+            EXIT.
+       1100-READ-PARA.
+            READ INFILE.
+            EVALUATE TRUE
+                WHEN WS-FS1 = 0
+                      DISPLAY 'READ INFILE SUCCESS'
+                      PERFORM 1200-VALIDATE-PARA THRU
+                              1200-VALIDATE-PARA-EXIT
+                WHEN OTHER
+                      DISPLAY 'READ INFILE ERROR' WS-FS1
+           END-EVALUATE.
+       1100-READ-PARA-EXIT.
+            EXIT.
+       1200-VALIDATE-PARA.
+            DISPLAY "VALIDATION PROCESSING"
+            EVALUATE TRUE
+                WHEN IN-HID NOT = SPACES AND
+                     IN-NAME NOT = SPACES AND
+                     IN-PLY-NO IS NUMERIC AND
+                    IN-PLY-AMT IS NUMERIC AND
+                     IN-PLY-ID NOT = SPACES AND
+                    IN-PLY-CODE NOT = SPACES AND
+                    IN-AGT-CODE NOT = SPACES
+                     DISPLAY "VALID SUCCESS"
+                     PERFORM 1300-INSERT-PARA THRU
+                             1300-INSERT-PARA-EXIT
+		     PERFORM 1350-WRITEOUT-PARA THRU
+                             1350-WRITEOUT-PARA-EXIT
+                     PERFORM 1400-WRITE-PARA THRU
+                             1400-WRITE-PARA-EXIT
+                WHEN OTHER
+                     DISPLAY "VALID FAILED"
+                     PERFORM 1500-ERROR-PARA THRU
+                             1500-ERROR-PARA-EXIT
+            END-EVALUATE.
+       1200-VALIDATE-PARA-EXIT.
+            EXIT.
+       1300-INSERT-PARA.
+            MOVE IN-HID TO HV1-HOLDER-ID.
+            MOVE IN-NAME TO HV1-HOLDER-NAME.
+            MOVE IN-STREET TO HV1-STREET.
+            MOVE IN-CITY TO HV1-CITY
+            MOVE IN-STATE TO HV1-STATE
+            MOVE IN-PIN   TO HV1-PIN-CODE
+            MOVE IN-PHONE TO HV1-PHONE-NUMBER
+            MOVE IN-PLY-NO TO HV1-POLICY-NUMBER
+            MOVE IN-PLY-AMT TO HV1-POLICY-AMOUNT
+            MOVE IN-DOB TO HV1-DATE-OF-BIRTH
+            MOVE IN-PLY-ID TO HV1-POLICY-ID
+            MOVE IN-PLY-CODE TO HV1-POLICY-CODE
+            MOVE IN-AGT-CODE TO HV1-AGENT-CODE
+            EXEC SQL
+               INSERT INTO HOLDERTBL VALUES(
+                 :HV1-HOLDER-ID,
+                 :HV1-HOLDER-NAME,
+                 :HV1-STREET,
+                 :HV1-CITY,
+                 :HV1-STATE,
+                 :HV1-PIN-CODE,
+                 :HV1-PHONE-NUMBER,
+                 :HV1-POLICY-NUMBER,
+                 :HV1-POLICY-AMOUNT,
+                 :HV1-DATE-OF-BIRTH,
+                 :HV1-POLICY-ID,
+                 :HV1-POLICY-CODE,
+                 :HV1-AGENT-CODE)
+            END-EXEC.
+            MOVE SQLCODE TO WS-SQLCODE
+                 EVALUATE TRUE
+                    WHEN SQLCODE = 0
+                         DISPLAY " INSERT SUCCESS "
+                    WHEN OTHER
+                         DISPLAY "INSERT FAILED " WS-SQLCODE.
+       1300-INSERT-PARA-EXIT.
+            EXIT.
+       1350-WRITEOUT-PARA.
+            MOVE IN-HID TO O-HOLDER-ID.
+            MOVE IN-NAME TO O-HOLDER-NAME.
+            MOVE IN-STREET TO O-STREET.
+            MOVE IN-CITY TO O-CITY
+            MOVE IN-STATE TO O-STATE
+            MOVE IN-PIN   TO O-PIN-CODE
+            MOVE IN-PHONE TO O-PHONE-NUMBER
+            MOVE IN-PLY-NO TO O-POLICY-NUMBER
+            MOVE IN-PLY-AMT TO O-POLICY-AMOUNT
+            MOVE IN-DOB TO O-DATE-OF-BIRTH
+            MOVE IN-PLY-ID TO O-POLICY-ID
+            MOVE IN-PLY-CODE TO O-POLICY-CODE
+            MOVE IN-AGT-CODE TO O-AGENT-CODE
+	    WRITE OUTREC2.
+       1350-WRITEOUT-PARA-EXIT.
+            EXIT.	    
+       1400-WRITE-PARA.
+            MOVE IN-HID TO K-HID.
+            MOVE IN-PLY-ID TO K-PID.
+            MOVE IN-DOB TO K-DOB.
+            MOVE IN-AGT-CODE TO K-AGT-CODE.
+            WRITE OUTREC.
+                EVALUATE TRUE
+                    WHEN WS-FS3 = 0
+                         DISPLAY " WRITE SUCCESS "
+                    WHEN OTHER
+                         DISPLAY " WRITE FAILED" WS-FS3
+                END-EVALUATE.
+       1400-WRITE-PARA-EXIT.
+            EXIT.
+       1500-ERROR-PARA.
+            MOVE INREC TO ERRREC.
+            DISPLAY "WRITE ERR PROCESSING".
+            EVALUATE TRUE
+               WHEN IN-HID = SPACES
+                  MOVE "INVALID" TO ERR-MSG
+               WHEN IN-NAME = SPACES
+                  MOVE "INVALID" TO ERR-MSG
+               WHEN IN-PLY-AMT NOT NUMERIC
+                  MOVE "INVALID" TO ERR-MSG
+               WHEN OTHER
+                  MOVE "OTHER ERR" TO ERR-MSG
+            END-EVALUATE.
+            WRITE ERRREC.
+               EVALUATE TRUE
+                WHEN WS-FS2  = 0
+                      DISPLAY 'WRTIE ERRFILE SUCCESS'
+                WHEN OTHER
+                      DISPLAY 'WRITE ERRFILE ERROR' WS-FS2
+           END-EVALUATE.
+       1500-ERROR-PARA-EXIT.
+            EXIT.
+       2000-FETCH-PARA.
+            EXEC SQL
+               FETCH CUR1 INTO
+                 :HV1-HOLDER-ID,
+                 :HV1-HOLDER-NAME,
+                 :HV1-STREET,
+                 :HV1-CITY,
+                 :HV1-STATE,
+                 :HV1-PIN-CODE,
+                 :HV1-PHONE-NUMBER,
+                 :HV1-POLICY-NUMBER,
+                 :HV1-POLICY-AMOUNT,
+                 :HV1-DATE-OF-BIRTH,
+                 :HV1-POLICY-ID,
+                 :HV1-POLICY-CODE,
+                 :HV1-AGENT-CODE
+            END-EXEC.
+       2000-FETCH-PARA-EXIT.
+            EXIT.
+       3000-CLOSE-PARA.
+            CLOSE INFILE.
+            CLOSE ERRFILE.
+            CLOSE OUTFILE.
+            EXEC SQL
+                CLOSE CUR1
+            END-EXEC.
+            EVALUATE TRUE
+                 WHEN SQLCODE = 0
+                       DISPLAY 'CLOSE SUCCESS'
+                 WHEN OTHER
+                       DISPLAY 'CLOSE ERROR'  WS-SQLCODE
+            END-EVALUATE.
+       3000-CLOSE-PARA-EXIT.
+            EXIT.
+       9000-TERM-PARA.
+            EXIT.
+       9000-TERM-PARA-EXIT.
+            STOP RUN.
+
