@@ -1,0 +1,15 @@
+//TECN096A JOB NOTIFY=&SYSUID
+//STEP002  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+    DELETE TECN096.FINAL.PROJECT.OUT.KSDS
+    DEFINE CLUSTER(NAME(TECN096.FINAL.PROJECT.OUT.KSDS) -
+    TRACKS(5,5) -
+    VOLUME(ZAPRD4)                       -
+    KEYS(5,0)                           -
+    CISZ(4096)                           -
+    RECORDSIZE(80,80)                    -
+    FREESPACE(10,10)                     -
+    INDEXED)
+/*
+
