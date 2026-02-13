@@ -1,0 +1,73 @@
+      ******************************************************************
+      * DCLGEN TABLE(TECN096.HOLDERTBL)                                *
+      *        LIBRARY(TECN096.DB2.DCLGEN(HOLDCL))                     *
+      *        ACTION(REPLACE)                                         *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(HV1-)                                             *
+      *        QUOTE                                                   *
+      *        LABEL(YES)                                              *
+      *        COLSUFFIX(YES)                                          *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE TECN096.HOLDERTBL TABLE
+           ( HOLDER_ID                      CHAR(5) NOT NULL,
+             HOLDER_NAME                    CHAR(10),
+             STREET                         CHAR(20),
+             CITY                           CHAR(20),
+             STATE                          CHAR(20),
+             PIN_CODE                       CHAR(6),
+             PHONE_NUMBER                   CHAR(12),
+             POLICY_NUMBER                  CHAR(11),
+             POLICY_AMOUNT                  DECIMAL(10, 2),
+             DATE_OF_BIRTH                  CHAR(10),
+             POLICY_ID                      CHAR(5),
+             POLICY_CODE                    CHAR(10),
+             AGENT_CODE                     CHAR(5)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE TECN096.HOLDERTBL                  *
+      ******************************************************************
+       01  DCLHOLDERTBL.
+      *    *************************************************************
+      *                       HOLDER_ID
+           10 HV1-HOLDER-ID        PIC X(5).
+      *    *************************************************************
+      *                       HOLDER_NAME
+           10 HV1-HOLDER-NAME      PIC X(10).
+      *    *************************************************************
+      *                       STREET
+           10 HV1-STREET           PIC X(20).
+      *    *************************************************************
+      *                       CITY
+           10 HV1-CITY             PIC X(20).
+      *    *************************************************************
+      *                       STATE
+           10 HV1-STATE            PIC X(20).
+      *    *************************************************************
+      *                       PIN_CODE
+           10 HV1-PIN-CODE         PIC X(6).
+      *    *************************************************************
+      *                       PHONE_NUMBER
+           10 HV1-PHONE-NUMBER     PIC X(12).
+      *    *************************************************************
+      *                       POLICY_NUMBER
+           10 HV1-POLICY-NUMBER    PIC X(11).
+      *    *************************************************************
+      *                       POLICY_AMOUNT
+           10 HV1-POLICY-AMOUNT    PIC S9(8)V9(2) USAGE COMP-3.
+      *    *************************************************************
+      *                       DATE_OF_BIRTH
+           10 HV1-DATE-OF-BIRTH    PIC X(10).
+      *    *************************************************************
+      *                       POLICY_ID
+           10 HV1-POLICY-ID        PIC X(5).
+      *    *************************************************************
+      *                       POLICY_CODE
+           10 HV1-POLICY-CODE      PIC X(10).
+      *    *************************************************************
+      *                       AGENT_CODE
+           10 HV1-AGENT-CODE       PIC X(5).
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 13      *
+      ******************************************************************
+
