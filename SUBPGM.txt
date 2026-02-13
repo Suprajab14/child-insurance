@@ -1,0 +1,13 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SUBPGM.
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01 LK-PLY-NO      PIC X(10).
+       01 LK-PLY-ID      PIC X(5).
+       01 LK-PLY-CODE    PIC X(10).
+       PROCEDURE DIVISION USING LK-PLY-NO LK-PLY-ID
+                                LK-PLY-CODE.
+                  MOVE LK-PLY-ID(1:1)     TO LK-PLY-CODE(1:1)
+                  MOVE LK-PLY-NO(2:9)    TO LK-PLY-CODE(2:9)
+                 GOBACK.
+
